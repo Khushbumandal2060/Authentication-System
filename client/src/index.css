@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    background: #0f172a;
+  }
+}
+
+@layer components {
+  .auth-card {
+    @apply w-full max-w-md rounded-3xl border border-slate-200/60 bg-white/90 p-8 shadow-2xl shadow-slate-900/10 backdrop-blur-xl;
+  }
+
+  .auth-input {
+    @apply w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100;
+  }
+
+  .auth-button {
+    @apply inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:from-indigo-500 hover:to-violet-500;
+  }
+
+  .auth-link {
+    @apply text-sm font-medium text-indigo-600 hover:text-indigo-700;
+  }
+
+  .message-error {
+    @apply rounded-2xl bg-rose-50 p-3 text-sm text-rose-600;
+  }
+
+  .message-success {
+    @apply rounded-2xl bg-emerald-50 p-3 text-sm text-emerald-600;
+  }
+}
