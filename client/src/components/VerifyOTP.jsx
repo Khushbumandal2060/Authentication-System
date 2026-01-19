@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import API from '../api/api';
 
 const VerifyOTP = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', otp: '' });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
@@ -13,8 +14,18 @@ const VerifyOTP = () => {
     e.preventDefault();
     try {
       const res = await API.post('/verify-otp', form);
-      setMessage(`${res.data.message}. Token: ${res.data.token}`);
+      
+      // Save token and email to automatically log in the user
+      localStorage.setItem('authToken', res.data.token);
+      localStorage.setItem('userEmail', form.email);
+      
+      setMessage('Email verified successfully! Redirecting...');
       setIsError(false);
+      
+      // Redirect to dashboard after a brief delay
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
     } catch (err) {
       setMessage(err.response?.data?.message || 'OTP verification failed');
       setIsError(true);
@@ -34,8 +45,25 @@ const VerifyOTP = () => {
       {message && <p className={isError ? 'message-error mb-4' : 'message-success mb-4'}>{message}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input name="email" placeholder="Email address" onChange={handleChange} className="auth-input" required />
-        <input name="otp" placeholder="OTP code" onChange={handleChange} className="auth-input" required />
+        <input 
+          type="email"
+          name="email" 
+          placeholder="Email address" 
+          value={form.email}
+          onChange={handleChange} 
+          className="auth-input" 
+          required 
+        />
+        <input 
+          type="text"
+          name="otp" 
+          placeholder="6-digit OTP code" 
+          value={form.otp}
+          onChange={handleChange} 
+          className="auth-input" 
+          maxLength="6"
+          required 
+        />
         <button type="submit" className="auth-button">Verify OTP</button>
       </form>
 

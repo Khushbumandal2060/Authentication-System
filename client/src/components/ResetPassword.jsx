@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import API from '../api/api';
 
 const ResetPassword = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', otp: '', newPassword: '' });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
@@ -13,8 +14,13 @@ const ResetPassword = () => {
     e.preventDefault();
     try {
       const res = await API.post('/reset-password', form);
-      setMessage(res.data.message);
+      setMessage(res.data.message + ' Redirecting to login...');
       setIsError(false);
+      
+      // Redirect to login after a brief delay
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (err) {
       setMessage(err.response?.data?.message || 'Error resetting password');
       setIsError(true);
@@ -34,9 +40,34 @@ const ResetPassword = () => {
       {message && <p className={isError ? 'message-error mb-4' : 'message-success mb-4'}>{message}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="email" name="email" placeholder="Email address" value={form.email} onChange={handleChange} className="auth-input" required />
-        <input name="otp" placeholder="OTP code" value={form.otp} onChange={handleChange} className="auth-input" required />
-        <input type="password" name="newPassword" placeholder="New password" value={form.newPassword} onChange={handleChange} className="auth-input" required />
+        <input 
+          type="email" 
+          name="email" 
+          placeholder="Email address" 
+          value={form.email} 
+          onChange={handleChange} 
+          className="auth-input" 
+          required 
+        />
+        <input 
+          type="text"
+          name="otp" 
+          placeholder="6-digit OTP code" 
+          value={form.otp} 
+          onChange={handleChange} 
+          className="auth-input" 
+          maxLength="6"
+          required 
+        />
+        <input 
+          type="password" 
+          name="newPassword" 
+          placeholder="New password" 
+          value={form.newPassword} 
+          onChange={handleChange} 
+          className="auth-input" 
+          required 
+        />
         <button type="submit" className="auth-button">Reset password</button>
       </form>
 
