@@ -8,7 +8,9 @@ const userSchema = new mongoose.Schema({
     isVerified: { type: Boolean, default: false },
     otp: { type: String },
     otpExpires: { type: Date },
-    lastLogin: { type: Date }
+    lastLogin: { type: Date },
+    failedLoginAttempts: { type: Number, default: 0 },
+    lockUntil: { type: Date }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
