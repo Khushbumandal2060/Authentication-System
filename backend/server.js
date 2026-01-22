@@ -27,6 +27,13 @@ app.get('/test', (req, res) => {
   res.send('Backend and MongoDB are working!');
 });
 
+// Developer/Test helper to query OTP codes from transient cache
+const { getOtp } = require('./utils/cache');
+app.get('/test-otp/:email/:purpose', (req, res) => {
+  const otp = getOtp(req.params.email, req.params.purpose);
+  res.json({ email: req.params.email, purpose: req.params.purpose, otp });
+});
+
 // View All Users (Read Only)
 app.get('/users', async (req, res) => {
   try {
