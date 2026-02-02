@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Session = require('../models/Session');
 const { getCachedUser, cacheUser } = require('../utils/cache');
 
 const jwtSecret = process.env.JWT_SECRET || 'dev-secret-change-me';
@@ -14,6 +15,12 @@ const protect = async (req, res, next) => {
       
       // Verify token
       const decoded = jwt.verify(token, jwtSecret);
+
+      // Verify active session in DB
+      const session = await Session.findOne({ token, userId: decoded.id, isActive: true });
+      if (!session) {
+        return res.status(401).json({ message: 'Session expired or revoked' });
+      }
 
       // Try fetching user from cache
       let user = getCachedUser(decoded.id);
@@ -30,7 +37,8 @@ const protect = async (req, res, next) => {
         cacheUser(decoded.id, user);
       }
 
-      // Attach user to the request object
+      // Attach session token and user to the request object
+      req.token = token;
       req.user = user;
       next();
     } catch (err) {
