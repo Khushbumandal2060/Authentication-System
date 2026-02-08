@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -10,33 +12,77 @@
   body {
     margin: 0;
     min-height: 100vh;
-    font-family: "Inter", "Segoe UI", sans-serif;
-    background: #0f172a;
+    font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+    background-color: #030712; /* Slate 950 deep dark */
+    color: #f3f4f6;
+    overflow-x: hidden;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.2);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.4);
   }
 }
 
 @layer components {
+  /* Dynamic Glass Card */
   .auth-card {
-    @apply w-full max-w-md rounded-3xl border border-slate-200/60 bg-white/90 p-8 shadow-2xl shadow-slate-900/10 backdrop-blur-xl;
+    @apply w-full max-w-md rounded-3xl border border-white/[0.08] bg-slate-900/40 p-8 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:border-indigo-500/20;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   }
 
   .auth-input {
-    @apply w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100;
+    @apply w-full rounded-2xl border border-white/[0.08] bg-slate-950/40 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 transition-all duration-300 focus:border-indigo-500/70 focus:bg-slate-950/70 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none;
   }
 
   .auth-button {
-    @apply inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:from-indigo-500 hover:to-violet-500;
+    @apply inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:scale-[1.01] hover:shadow-indigo-500/30 active:scale-[0.99];
   }
 
   .auth-link {
-    @apply text-sm font-medium text-indigo-600 hover:text-indigo-700;
+    @apply text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors duration-200;
   }
 
   .message-error {
-    @apply rounded-2xl bg-rose-50 p-3 text-sm text-rose-600;
+    @apply rounded-2xl border border-rose-500/20 bg-rose-500/10 p-3.5 text-sm text-rose-300 backdrop-blur-md;
   }
 
   .message-success {
-    @apply rounded-2xl bg-emerald-50 p-3 text-sm text-emerald-600;
+    @apply rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3.5 text-sm text-emerald-300 backdrop-blur-md;
   }
+}
+
+/* Floating animated gradient meshes */
+.bg-mesh-gradient {
+  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.12), transparent 50%),
+              radial-gradient(circle at 10% 20%, rgba(236, 72, 153, 0.08), transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.12), transparent 40%);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-15px) scale(1.03);
+  }
+}
+
+.animate-float-slow {
+  animation: float 12s ease-in-out infinite;
+}
+
+.animate-float-medium {
+  animation: float 8s ease-in-out infinite;
 }
