@@ -22,9 +22,9 @@ import API from '../api/api';
 
 const STATUS_DOT = {
   success: 'bg-emerald-500',
-  danger: 'bg-red-500',
+  danger: 'bg-rose-500',
   warning: 'bg-amber-500',
-  neutral: 'bg-zinc-500',
+  neutral: 'bg-slate-500',
 };
 
 const Dashboard = () => {
@@ -177,9 +177,10 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-8 text-center">
-        <Loader2 className="mx-auto mb-3 h-6 w-6 animate-spin text-zinc-500" />
-        <p className="text-sm text-zinc-400">Loading your account…</p>
+      <div className="auth-card relative overflow-hidden text-center">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+        <Loader2 className="mx-auto mb-3 h-6 w-6 animate-spin text-indigo-400" />
+        <p className="text-sm text-slate-400">Loading your account…</p>
       </div>
     );
   }
@@ -193,24 +194,29 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="w-full max-w-4xl rounded-2xl border border-zinc-800 bg-zinc-950 p-5 sm:p-7">
+    <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-white/[0.08] bg-slate-900/40 p-5 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:border-indigo-500/20 sm:p-8">
+      {/* Visual Accent Glow Header */}
+      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+
       {/* Header */}
-      <div className="flex flex-col gap-5 border-b border-zinc-800 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-5 border-b border-white/[0.06] pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3.5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-sm font-medium text-zinc-200">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-sm font-bold text-white shadow-lg shadow-indigo-500/20">
             {getInitials(user.name)}
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">Account security</p>
-            <h1 className="truncate text-lg font-semibold text-zinc-50">{user.name}</h1>
-            <p className="truncate text-xs text-zinc-500">{user.email}</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Account security</p>
+            <h1 className="truncate bg-gradient-to-r from-white to-slate-200 bg-clip-text text-lg font-bold text-transparent">
+              {user.name}
+            </h1>
+            <p className="truncate text-xs text-slate-400">{user.email}</p>
           </div>
         </div>
 
         <button
           type="button"
           onClick={handleLogout}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3.5 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-slate-950/40 px-3.5 py-2.5 text-xs font-semibold text-slate-300 transition-all duration-300 hover:border-indigo-500/70 hover:bg-slate-950/70 hover:text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/10"
         >
           <LogOut className="h-3.5 w-3.5" />
           Sign out
@@ -218,24 +224,22 @@ const Dashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div className="-mx-5 mt-5 overflow-x-auto px-5 sm:-mx-7 sm:px-7">
-        <div className="flex min-w-max gap-6 border-b border-zinc-800">
-          {tabs.map(({ id, label }) => (
-            <button
-              type="button"
-              key={id}
-              onClick={() => setActiveTab(id)}
-              aria-current={activeTab === id ? 'page' : undefined}
-              className={`shrink-0 whitespace-nowrap border-b-2 pb-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                activeTab === id
-                  ? 'border-zinc-50 text-zinc-50'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-300'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      <div className="mt-5 flex gap-1 rounded-xl border border-white/[0.04] bg-slate-950/60 p-1">
+        {tabs.map(({ id, label }) => (
+          <button
+            type="button"
+            key={id}
+            onClick={() => setActiveTab(id)}
+            aria-current={activeTab === id ? 'page' : undefined}
+            className={`flex-1 whitespace-nowrap rounded-lg py-2 text-xs font-semibold tracking-wide transition-all ${
+              activeTab === id
+                ? 'bg-slate-800 text-white shadow'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {/* Panels */}
@@ -243,37 +247,37 @@ const Dashboard = () => {
         {/* OVERVIEW */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            <div className="grid gap-px overflow-hidden rounded-lg border border-zinc-800 bg-zinc-800 sm:grid-cols-3">
-              <div className="bg-zinc-950 p-4">
-                <p className="text-xs text-zinc-500">Email</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/[0.08] bg-slate-950/40 p-4">
+                <p className="text-xs text-slate-500">Email</p>
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <p className="text-sm font-medium text-zinc-50">Verified</p>
+                  <p className="text-sm font-medium text-white">Verified</p>
                 </div>
               </div>
-              <div className="bg-zinc-950 p-4">
-                <p className="text-xs text-zinc-500">Login protection</p>
+              <div className="rounded-2xl border border-white/[0.08] bg-slate-950/40 p-4">
+                <p className="text-xs text-slate-500">Login protection</p>
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-                  <p className="text-sm font-medium text-zinc-50">Locks for 15m after 5 failed attempts</p>
+                  <p className="text-sm font-medium text-white">Locks for 15m after 5 failed attempts</p>
                 </div>
               </div>
-              <div className="bg-zinc-950 p-4">
-                <p className="text-xs text-zinc-500">Last sign-in</p>
-                <p className="mt-1.5 text-sm font-medium text-zinc-50">
+              <div className="rounded-2xl border border-white/[0.08] bg-slate-950/40 p-4">
+                <p className="text-xs text-slate-500">Last sign-in</p>
+                <p className="mt-1.5 text-sm font-medium text-white">
                   {user.lastLogin ? formatRelativeTime(user.lastLogin) : 'First session'}
                 </p>
                 {user.lastLogin && (
-                  <p className="mt-0.5 font-mono text-[11px] text-zinc-500">
+                  <p className="mt-0.5 font-mono text-[11px] text-slate-500">
                     {new Date(user.lastLogin).toLocaleString()}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="rounded-lg border border-zinc-800 p-4">
-              <h3 className="text-sm font-medium text-zinc-200">How your account is protected</h3>
-              <ul className="mt-2.5 space-y-1.5 text-xs leading-relaxed text-zinc-500">
+            <div className="rounded-2xl border border-white/[0.08] bg-slate-950/40 p-4">
+              <h3 className="text-sm font-semibold text-slate-200">How your account is protected</h3>
+              <ul className="mt-2.5 space-y-1.5 text-xs leading-relaxed text-slate-500">
                 <li>Passwords are hashed with bcrypt before they're stored — we never keep the plain text.</li>
                 <li>One-time verification codes expire automatically and can only be used once.</li>
                 <li>You can review every signed-in device and end any session below.</li>
@@ -286,25 +290,25 @@ const Dashboard = () => {
         {activeTab === 'sessions' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-zinc-500">Devices currently signed in to your account</p>
+              <p className="text-xs text-slate-500">Devices currently signed in to your account</p>
               <button
                 type="button"
                 onClick={fetchDashboardData}
                 disabled={actionLoading}
-                className="flex shrink-0 items-center gap-1.5 rounded-md px-1 text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-200 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex shrink-0 items-center gap-1.5 rounded-md px-1 text-xs font-semibold text-indigo-400 transition-colors hover:text-indigo-300 disabled:opacity-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/10"
               >
                 <RefreshCw className={`h-3 w-3 ${actionLoading ? 'animate-spin' : ''}`} /> Refresh
               </button>
             </div>
 
-            <div className="overflow-hidden rounded-lg border border-zinc-800">
+            <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-slate-950/40">
               {sessions.length === 0 ? (
                 <div className="flex flex-col items-center gap-2 p-10 text-center">
-                  <Inbox className="h-5 w-5 text-zinc-600" />
-                  <p className="text-xs text-zinc-500">No active sessions.</p>
+                  <Inbox className="h-5 w-5 text-slate-600" />
+                  <p className="text-xs text-slate-500">No active sessions.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-zinc-800">
+                <div className="divide-y divide-white/[0.06]">
                   {sessions.map((session) => {
                     const { browser, os, mobile } = parseUA(session.userAgent);
                     const isCurrent = session.token === currentToken;
@@ -316,19 +320,19 @@ const Dashboard = () => {
                         className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
                       >
                         <div className="flex min-w-0 items-center gap-3">
-                          <DeviceIcon className="h-4 w-4 shrink-0 text-zinc-500" />
+                          <DeviceIcon className="h-4 w-4 shrink-0 text-slate-500" />
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-sm font-medium text-zinc-100">
+                              <span className="text-sm font-medium text-slate-100">
                                 {browser} on {os}
                               </span>
                               {isCurrent && (
-                                <span className="rounded border border-zinc-700 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+                                <span className="rounded border border-indigo-500/30 bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-medium text-indigo-300">
                                   Current session
                                 </span>
                               )}
                             </div>
-                            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] text-zinc-500">
+                            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] text-slate-500">
                               <span className="flex items-center gap-1">
                                 <MapPin className="h-3 w-3" /> {session.ipAddress}
                               </span>
@@ -343,7 +347,7 @@ const Dashboard = () => {
                           type="button"
                           onClick={() => handleRevokeSession(session._id)}
                           disabled={actionLoading}
-                          className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-md px-2 py-1 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-50 sm:self-center focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                          className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg px-2.5 py-1.5 text-xs font-semibold text-rose-400 transition-colors hover:bg-rose-500/10 disabled:opacity-50 sm:self-center focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-500/10"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           {isCurrent ? 'Sign out' : 'Sign out device'}
@@ -360,15 +364,15 @@ const Dashboard = () => {
         {/* ACTIVITY LOG */}
         {activeTab === 'activity' && (
           <div className="space-y-3">
-            <p className="text-xs text-zinc-500">Recent activity on your account</p>
-            <div className="overflow-hidden rounded-lg border border-zinc-800">
+            <p className="text-xs text-slate-500">Recent activity on your account</p>
+            <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-slate-950/40">
               {activities.length === 0 ? (
                 <div className="flex flex-col items-center gap-2 p-10 text-center">
-                  <Inbox className="h-5 w-5 text-zinc-600" />
-                  <p className="text-xs text-zinc-500">No activity recorded yet.</p>
+                  <Inbox className="h-5 w-5 text-slate-600" />
+                  <p className="text-xs text-slate-500">No activity recorded yet.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-zinc-800">
+                <div className="divide-y divide-white/[0.06]">
                   {activities.map((log) => {
                     const details = getActionDetails(log.action);
                     const LogIcon = details.icon;
@@ -376,15 +380,15 @@ const Dashboard = () => {
 
                     return (
                       <div key={log._id} className="flex items-start gap-3 p-4">
-                        <div className="relative mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-800">
-                          <LogIcon className="h-3.5 w-3.5 text-zinc-400" />
+                        <div className="relative mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-slate-900/60">
+                          <LogIcon className="h-3.5 w-3.5 text-slate-400" />
                           <span
-                            className={`absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full ring-2 ring-zinc-950 ${STATUS_DOT[details.status]}`}
+                            className={`absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full ring-2 ring-slate-950 ${STATUS_DOT[details.status]}`}
                           />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm text-zinc-200">{details.text}</p>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] text-zinc-500">
+                          <p className="truncate text-sm text-slate-200">{details.text}</p>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] text-slate-500">
                             <span className="flex items-center gap-1">
                               <MapPin className="h-3 w-3" /> {log.ipAddress || '127.0.0.1'}
                             </span>
