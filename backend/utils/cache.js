@@ -67,6 +67,37 @@ const invalidateUserCache = (userId) => {
   appCache.del(key);
 };
 
+/**
+ * Store a CAPTCHA answer in the cache, keyed by a one-time captchaId.
+ * @param {string} captchaId
+ * @param {string|number} answer
+ * @param {number} ttlSeconds - Default 5 minutes (300 seconds)
+ */
+const setCaptcha = (captchaId, answer, ttlSeconds = 300) => {
+  const key = `captcha:${captchaId}`;
+  appCache.set(key, answer.toString(), ttlSeconds);
+};
+
+/**
+ * Retrieve a CAPTCHA answer from the cache.
+ * @param {string} captchaId
+ * @returns {string|undefined}
+ */
+const getCaptcha = (captchaId) => {
+  const key = `captcha:${captchaId}`;
+  return appCache.get(key);
+};
+
+/**
+ * Delete a CAPTCHA from the cache. Always call this after verification
+ * (success or failure) so a captcha answer can never be reused/replayed.
+ * @param {string} captchaId
+ */
+const deleteCaptcha = (captchaId) => {
+  const key = `captcha:${captchaId}`;
+  appCache.del(key);
+};
+
 module.exports = {
   setOtp,
   getOtp,
@@ -74,5 +105,8 @@ module.exports = {
   cacheUser,
   getCachedUser,
   invalidateUserCache,
+  setCaptcha,
+  getCaptcha,
+  deleteCaptcha,
   cacheInstance: appCache // exported in case raw access is needed
 };
