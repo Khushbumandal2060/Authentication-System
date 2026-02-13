@@ -227,7 +227,7 @@ const Login = () => {
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>
-                Continue Securing <ArrowRight className="h-4 w-4" />
+                Login <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
@@ -311,7 +311,7 @@ const Login = () => {
       <div className="mt-8 flex items-center justify-between text-xs">
         <Link to="/register" className="auth-link">Create an account</Link>
         {mode === "password" && (
-          <Link to="/forgot-password" className="auth-link">Recover password?</Link>
+          <Link to="/forgot-password" className="auth-link">Forgot password?</Link>
         )}
       </div>
     </div>
