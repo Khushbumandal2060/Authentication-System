@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Eye, EyeOff, Check, X, ShieldAlert, Loader2, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Check, X, ShieldAlert, Loader2, ArrowRight, RefreshCw } from 'lucide-react';
 import API from '../api/api';
 
 const Register = () => {
@@ -10,6 +10,30 @@ const Register = () => {
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // CAPTCHA state
+  const [captchaId, setCaptchaId] = useState('');
+  const [captchaSvg, setCaptchaSvg] = useState('');
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [captchaLoading, setCaptchaLoading] = useState(false);
+
+  const fetchCaptcha = useCallback(async () => {
+    setCaptchaLoading(true);
+    setCaptchaAnswer('');
+    try {
+      const res = await API.get('/captcha');
+      setCaptchaId(res.data.captchaId);
+      setCaptchaSvg(res.data.svg);
+    } catch (err) {
+      setCaptchaSvg('');
+    } finally {
+      setCaptchaLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, [fetchCaptcha]);
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -44,10 +68,16 @@ const Register = () => {
       return;
     }
 
+    if (!captchaAnswer.trim()) {
+      setMessage('Please solve the CAPTCHA to continue.');
+      setIsError(true);
+      return;
+    }
+
     setLoading(true);
     setMessage('');
     try {
-      const res = await API.post('/register', form);
+      const res = await API.post('/register', { ...form, captchaId, captchaAnswer });
       setMessage(res.data.message);
       setIsError(false);
       
@@ -61,6 +91,8 @@ const Register = () => {
     } catch (err) {
       setMessage(err.response?.data?.message || 'Registration failed');
       setIsError(true);
+      // CAPTCHA is single-use server-side (deleted on every attempt), so always refresh it
+      fetchCaptcha();
     } finally {
       setLoading(false);
     }
@@ -181,6 +213,46 @@ const Register = () => {
             </div>
           </div>
         )}
+
+        {/* CAPTCHA Widget */}
+        <div className="rounded-2xl border border-white/[0.04] bg-slate-950/30 p-4 space-y-3">
+          <div className="flex items-center justify-between text-xs font-semibold">
+            <span className="text-slate-400">Security Check:</span>
+            <button
+              type="button"
+              onClick={fetchCaptcha}
+              disabled={captchaLoading}
+              className="flex items-center gap-1 text-slate-500 hover:text-white transition-colors disabled:opacity-50"
+              title="Get a new question"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${captchaLoading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex-1 overflow-hidden rounded-xl border border-white/[0.06] bg-slate-900/60 flex items-center justify-center"
+              style={{ minHeight: '70px' }}
+            >
+              {captchaSvg ? (
+                <div
+                  className="w-full h-full [&>svg]:w-full [&>svg]:h-full"
+                  dangerouslySetInnerHTML={{ __html: captchaSvg }}
+                />
+              ) : (
+                <span className="text-xs text-slate-500">{captchaLoading ? 'Loading…' : 'Unavailable'}</span>
+              )}
+            </div>
+            <input
+              type="text"
+              placeholder="Enter code"
+              value={captchaAnswer}
+              onChange={e => setCaptchaAnswer(e.target.value)}
+              className="auth-input w-32 text-center"
+              autoComplete="off"
+              required
+            />
+          </div>
+        </div>
 
         <button type="submit" disabled={loading} className="auth-button gap-2">
           {loading ? (
