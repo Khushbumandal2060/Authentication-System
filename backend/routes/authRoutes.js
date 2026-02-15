@@ -4,6 +4,7 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
+router.get('/captcha', authController.generateCaptcha);
 router.post('/register', authController.register);
 router.post('/verify-otp', authController.verifyOTP);
 router.post('/login', authController.login);
