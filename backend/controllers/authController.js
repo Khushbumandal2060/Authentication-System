@@ -3,11 +3,23 @@ const Session = require('../models/Session');
 const ActivityLog = require('../models/ActivityLog');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Resend } = require('resend');
-const { setOtp, getOtp, deleteOtp, invalidateUserCache } = require('../utils/cache');
+const nodemailer = require('nodemailer');
+const { setOtp, getOtp, deleteOtp, invalidateUserCache, setCaptcha, getCaptcha, deleteCaptcha } = require('../utils/cache');
+const crypto = require('crypto');
+const svgCaptcha = require('svg-captcha');
 
 const jwtSecret = process.env.JWT_SECRET || 'dev-secret-change-me';
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Gmail SMTP transporter (uses an App Password, NOT your normal Gmail password)
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // STARTTLS
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 /**
  * Sends an OTP email or logs it as a fallback if the API key is not set.
@@ -21,8 +33,8 @@ const sendOTPEmail = async (recipientEmail, otpCode, purpose) => {
   console.log(`[TESTING OTP] Code is: ${otpCode}`);
   console.log(`=================================================\n`);
 
-  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'your_resend_api_key') {
-    console.warn('[EMAIL SENDER] Resend API key is missing or placeholder. Skipping actual email dispatch.');
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || process.env.EMAIL_PASS === 'your_gmail_app_password') {
+    console.warn('[EMAIL SENDER] EMAIL_USER or EMAIL_PASS is missing or placeholder. Skipping actual email dispatch.');
     return false;
   }
 
@@ -56,8 +68,8 @@ const sendOTPEmail = async (recipientEmail, otpCode, purpose) => {
               </div>`;
     }
 
-    await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+    await transporter.sendMail({
+      from: `"SecureAuth" <${process.env.EMAIL_USER}>`,
       to: recipientEmail,
       subject: subject,
       html: html
@@ -74,13 +86,54 @@ const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+// ---------------- GENERATE CAPTCHA ----------------
+exports.generateCaptcha = async (req, res) => {
+  try {
+    const captcha = svgCaptcha.create({
+      size: 6,                 // 6 random characters
+      noise: 3,                // 3 random distortion lines through the text
+      color: true,             // colored characters (harder for bots to threshold)
+      background: '#0f172a',   // matches the dark slate theme
+      ignoreChars: '0o1ilI',   // remove visually ambiguous characters
+      width: 200,
+      height: 70,
+      fontSize: 60
+    });
+
+    // svg-captcha text is case-insensitive by default in most bot-resistant setups;
+    // store it lowercased so verification is forgiving of case typed by the user.
+    const captchaId = crypto.randomBytes(16).toString('hex');
+    setCaptcha(captchaId, captcha.text.toLowerCase(), 300); // valid for 5 minutes
+
+    res.status(200).json({ captchaId, svg: captcha.data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // ---------------- REGISTER ----------------
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, captchaId, captchaAnswer } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required' });
+    }
+
+    if (!captchaId || captchaAnswer === undefined || captchaAnswer === null || captchaAnswer === '') {
+      return res.status(400).json({ message: 'Please complete the CAPTCHA' });
+    }
+
+    const cachedAnswer = getCaptcha(captchaId);
+    // Always delete after a single check attempt so it can never be reused/brute-forced
+    deleteCaptcha(captchaId);
+
+    if (cachedAnswer === undefined) {
+      return res.status(400).json({ message: 'CAPTCHA has expired. Please try again.' });
+    }
+
+    if (cachedAnswer !== captchaAnswer.toString().trim().toLowerCase()) {
+      return res.status(400).json({ message: 'Incorrect CAPTCHA answer. Please try again.' });
     }
 
     const recipientEmail = email.trim().toLowerCase();
