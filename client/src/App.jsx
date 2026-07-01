@@ -20,19 +20,22 @@ function App() {
 
         {/* Global Navigation bar */}
         <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-slate-950/60 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <Link to="/login" className="flex items-center gap-2.5 text-base font-bold tracking-tight text-white hover:opacity-90 transition-opacity">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md shadow-indigo-500/25">
-                <ShieldCheck className="h-5.5 w-5.5" />
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
+            <Link to="/login" className="flex shrink-0 items-center gap-2 text-sm font-bold tracking-tight text-white hover:opacity-90 transition-opacity sm:gap-2.5 sm:text-base">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md shadow-indigo-500/25 sm:h-10 sm:w-10 sm:rounded-2xl">
+                <ShieldCheck className="h-4.5 w-4.5 sm:h-5.5 sm:w-5.5" />
               </span>
               <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
                 SecureAuth
               </span>
             </Link>
-            <div className="flex items-center gap-5 text-sm font-medium text-slate-400">
-              <Link to="/register" className="hover:text-white transition-colors">Register</Link>
-              <Link to="/verify-otp" className="hover:text-white transition-colors">Verify OTP</Link>
-              <Link to="/login" className="hover:text-white transition-colors">Login</Link>
+            <div className="flex items-center gap-3 text-xs font-medium text-slate-400 sm:gap-5 sm:text-sm">
+              <Link to="/register" className="whitespace-nowrap hover:text-white transition-colors">Register</Link>
+              <Link to="/verify-otp" className="whitespace-nowrap hover:text-white transition-colors">
+                <span className="sm:hidden">OTP</span>
+                <span className="hidden sm:inline">Verify OTP</span>
+              </Link>
+              <Link to="/login" className="whitespace-nowrap hover:text-white transition-colors">Login</Link>
             </div>
           </div>
         </nav>
